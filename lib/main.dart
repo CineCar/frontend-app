@@ -5,37 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import './models/movie.dart';
-
-Future<List<Movie>> fetchMovie() async {
-  final response = await http.get('https://api.ticketshop.mixify.ga/movies');
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    print(response.body);
-
-    List<dynamic> data = json.decode(response.body)['data'];
-    List<Movie> movies = data.map((data) => Movie.fromJson(data)).toList();
-
-    return movies;
-    // return Movie.fromJson(json.decode(response.body)['data']);
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load movie');
-  }
-}
+import './future.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
-  MyApp({Key key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: new MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyHomePage> {
   Future<List<Movie>> futureMovie;
 
   @override
@@ -46,39 +41,44 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CineCar',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('CineCar Movies'),
-        ),
-        body: Center(
-          child: FutureBuilder<List<Movie>>(
-            future: futureMovie,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, index) {
-                    Movie movie = snapshot.data[index];
-                    return Column(
-                      children: <Widget>[Text(movie.name)],
-                    );
-                  },
-                );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
-              }
+    var futureBuilder = new FutureBuilder<List<Movie>>(
+      future: futureMovie,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return createListView(context, snapshot);
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
 
-              // By default, show a loading spinner.
-              return CircularProgressIndicator();
-            },
-          ),
-        ),
+        // By default, show a loading spinner.
+        return CircularProgressIndicator();
+      },
+    );
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Home Page"),
       ),
+      body: futureBuilder,
+    );
+  }
+
+  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    List<Movie> values = snapshot.data;
+    return new ListView.builder(
+      itemCount: values.length,
+      itemBuilder: (BuildContext context, int index) {
+        return new Column(
+          children: <Widget>[
+            new ListTile(
+              title: new Text(values[index].name),
+              subtitle: new Text(values[index].duration.toString()),
+            ),
+            new Divider(
+              height: 2.0,
+            ),
+          ],
+        );
+      },
     );
   }
 }
