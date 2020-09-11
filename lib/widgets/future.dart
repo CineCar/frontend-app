@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
-import './models/movie.dart';
+import '../models/movie.dart';
 
 Future<List<Movie>> fetchMovie() async {
   final response = await http.get('https://api.ticketshop.mixify.ga/movies');
