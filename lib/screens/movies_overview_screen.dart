@@ -1,10 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/movie.dart';
-import '../widgets/future.dart';
-import '../screens/movie_detail_screen.dart';
 import '../widgets/movies_grid.dart';
+import '../widgets/badge.dart';
+import '../providers/cart.dart';
+import './cart_screen.dart';
+
+enum FilterOptions {
+  Favorites,
+  All,
+}
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -14,21 +19,53 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyHomePage> {
-  // Future<List<Movie>> futureMovie;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   futureMovie = fetchMovie();
-  // }
+  var _showOnlyFavorites = false;
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("CineCar Movies"),
+        actions: <Widget>[
+          PopupMenuButton(
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if (selectedValue == FilterOptions.Favorites) {
+                  _showOnlyFavorites = true;
+                } else {
+                  _showOnlyFavorites = false;
+                }
+              });
+              print(selectedValue);
+            },
+            icon: Icon(
+              Icons.more_vert,
+            ),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                  child: Text('Only Favorites'),
+                  value: FilterOptions.Favorites),
+              PopupMenuItem(child: Text('Show All'), value: FilterOptions.All),
+            ],
+          ),
+          Consumer<Cart>(
+            builder: (_, cart, ch) => Badge(
+              child: ch,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.shopping_cart,
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+            ),
+          ),
+        ],
+        centerTitle: true,
       ),
-      body: MoviesGrid(),
+      body: MoviesGrid(_showOnlyFavorites),
     );
   }
 }

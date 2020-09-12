@@ -1,12 +1,15 @@
+import 'package:flutter/foundation.dart';
+
 import 'movie_screenings.dart';
 
-class Movie {
+class Movie with ChangeNotifier {
   final int id;
   final String name;
   final int duration;
   final double price;
   final String imageUrl;
   final List<dynamic> movieScreenings;
+  bool isFavorite;
 
   Movie({
     this.id,
@@ -15,6 +18,7 @@ class Movie {
     this.price,
     this.imageUrl,
     this.movieScreenings,
+    this.isFavorite = false,
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) {
@@ -28,5 +32,10 @@ class Movie {
           .map((data) => MovieScreenings.fromJson(data))
           .toList(),
     );
+  }
+
+  void toggleFavoriteStatus() {
+    isFavorite = !isFavorite;
+    notifyListeners();
   }
 }

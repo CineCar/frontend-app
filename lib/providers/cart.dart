@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 class CartItem {
@@ -15,11 +14,23 @@ class CartItem {
   });
 }
 
-class Cart {
-  Map<String, CartItem> _movies;
+class Cart with ChangeNotifier {
+  Map<String, CartItem> _items = {};
 
-  Map<String, CartItem> get movies {
-    return {..._movies};
+  Map<String, CartItem> get items {
+    return {..._items};
+  }
+
+  int get itemCount {
+    return _items.length;
+  }
+
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   void addItem(
@@ -27,8 +38,8 @@ class Cart {
     double price,
     String name,
   ) {
-    if (_movies.containsKey(movieId)) {
-      _movies.update(
+    if (_items.containsKey(movieId)) {
+      _items.update(
           movieId,
           (existingCartItem) => CartItem(
                 id: existingCartItem.id,
@@ -37,7 +48,7 @@ class Cart {
                 quantity: existingCartItem.quantity + 1,
               ));
     } else {
-      _movies.putIfAbsent(
+      _items.putIfAbsent(
         movieId,
         () => CartItem(
           id: DateTime.now().toString(),
@@ -47,5 +58,6 @@ class Cart {
         ),
       );
     }
+    notifyListeners();
   }
 }

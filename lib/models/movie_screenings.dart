@@ -1,5 +1,3 @@
-import 'movie.dart';
-
 class MovieScreenings {
   final int id;
   final DateTime date;
