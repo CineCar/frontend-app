@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'movie_screenings.dart';
+import 'movie_screening.dart';
 
 class Movie with ChangeNotifier {
   final int id;
@@ -29,7 +29,7 @@ class Movie with ChangeNotifier {
       price: json['price'].toDouble(),
       imageUrl: json['imageUrl'],
       movieScreenings: json['movieScreenings']
-          .map((data) => MovieScreenings.fromJson(data))
+          .map((data) => MovieScreening.fromJson(data))
           .toList(),
     );
   }

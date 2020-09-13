@@ -4,8 +4,30 @@ import 'dart:convert';
 
 import '../models/movie.dart';
 
+final String url = 'api.ticketshop.mixify.ga';
+final String protocol = 'https';
+
+// Future<dynamic> fetch(String requestMethod, String endPoint,
+//     [dynamic body]) async {
+//       var response;
+//   if (requestMethod == "GET") {
+//     response = await http.get('$protocol://$url/$endPoint');
+//   } else if (requestMethod == "POST") {
+//     response = await http.post('$protocol://$url/$endPoint', body: body);
+//   }
+
+//   if(response.statusCode == 200){
+
+//     dynamic data = json.decode(response.body)['data'];
+
+//     return data;
+
+//   } else throw Exception('Failed to reach backend.')
+
+// }
+
 Future<List<Movie>> fetchMovie() async {
-  final response = await http.get('https://api.ticketshop.mixify.ga/movies');
+  final response = await http.get('$protocol://$url/movies');
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,

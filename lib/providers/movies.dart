@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_app/widgets/movie_item.dart';
 import 'dart:async';
-import 'package:provider/provider.dart';
 
 import '../models/movie.dart';
 import '../widgets/future.dart';
