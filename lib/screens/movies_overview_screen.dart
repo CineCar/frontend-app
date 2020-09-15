@@ -3,13 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../widgets/movies_grid.dart';
 import '../widgets/badge.dart';
-import '../providers/cart.dart';
+import '../providers/cart_provider.dart';
 import './cart_screen.dart';
-
-enum FilterOptions {
-  Favorites,
-  All,
-}
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -19,39 +14,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyHomePage> {
-  var _showOnlyFavorites = false;
+  static int convertItemCount = 0;
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<CartProvider>(context).itemCount.then((value) {
+      convertItemCount = value;
+    });
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("CineCar Movies"),
         actions: <Widget>[
-          PopupMenuButton(
-            onSelected: (FilterOptions selectedValue) {
-              setState(() {
-                if (selectedValue == FilterOptions.Favorites) {
-                  _showOnlyFavorites = true;
-                } else {
-                  _showOnlyFavorites = false;
-                }
-              });
-              print(selectedValue);
-            },
-            icon: Icon(
-              Icons.more_vert,
-            ),
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                  child: Text('Only Favorites'),
-                  value: FilterOptions.Favorites),
-              PopupMenuItem(child: Text('Show All'), value: FilterOptions.All),
-            ],
-          ),
-          Consumer<Cart>(
+          Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
               child: ch,
-              value: cart.itemCount.toString(),
+              value: convertItemCount.toString(),
             ),
             child: IconButton(
               icon: Icon(
@@ -65,7 +42,7 @@ class _MyAppState extends State<MyHomePage> {
         ],
         centerTitle: true,
       ),
-      body: MoviesGrid(_showOnlyFavorites),
+      body: MoviesGrid(),
     );
   }
 }
