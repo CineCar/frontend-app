@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_app/models/cart.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/cart.dart' show Cart;
+import '../providers/cart_provider.dart';
 import '../widgets/cart_item.dart';
+import '../providers/orders_provider.dart';
 
 class CartScreen extends StatelessWidget {
   static const routeName = '/cart';
+
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<Cart>(context);
+    final cartProvider = Provider.of<CartProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Cart'),
@@ -28,36 +32,71 @@ class CartScreen extends StatelessWidget {
                   ),
                   Spacer(),
                   Chip(
-                    label: Text(
-                      '\$${cart.totalAmount}',
-                      style: TextStyle(
-                          color: Theme.of(context)
-                              .primaryTextTheme
-                              .headline6
-                              .color),
-                    ),
+                    label: FutureBuilder<Cart>(
+                        future: cartProvider.cart,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var total = 0.0;
+                            snapshot.data.tickets.forEach((ticket) {
+                              total += ticket.movieScreening.movie.price;
+                            });
+                            return Text(
+                              total.toString(),
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .primaryTextTheme
+                                      .headline6
+                                      .color),
+                            );
+                          } else {
+                            return Text('---');
+                          }
+                        }),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  FlatButton(
-                    child: Text('ORDER NOW'),
-                    onPressed: () {},
-                    textColor: Theme.of(context).primaryColor,
-                  )
+                  FutureBuilder<Cart>(
+                      future: cartProvider.cart,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return FlatButton(
+                            child: Text('Checkout'),
+                            onPressed: () {
+                              var total = 0.0;
+                              snapshot.data.tickets.forEach((ticket) {
+                                total += ticket.movieScreening.movie.price;
+                              });
+                              Provider.of<Orders>(context, listen: false)
+                                  .addOrders(snapshot.data.tickets, total);
+                              // cartProvider.checkoutCartx();
+                            },
+                            textColor: Theme.of(context).primaryColor,
+                          );
+                        } else {
+                          return Text('---');
+                        }
+                      }),
                 ],
               ),
             ),
           ),
           SizedBox(height: 10),
           Expanded(
-            child: ListView.builder(
-              itemCount: cart.items.length,
-              itemBuilder: (ctx, i) => CartItem(
-                cart.items.values.toList()[i].id,
-                cart.items.values.toList()[i].price,
-                cart.items.values.toList()[i].quantity,
-                cart.items.values.toList()[i].name,
-              ),
-            ),
+            child: FutureBuilder<Cart>(
+                future: cartProvider.cart,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data.tickets.length,
+                      itemBuilder: (ctx, i) => TicketWidget(
+                        snapshot.data.tickets.toList()[i].id,
+                        snapshot.data.tickets.toList()[i].movieScreening,
+                        snapshot.data.tickets.toList()[i].booking,
+                      ),
+                    );
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                }),
           ),
         ],
       ),

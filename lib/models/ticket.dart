@@ -13,10 +13,14 @@ class Ticket {
   });
 
   factory Ticket.fromJson(Map<String, dynamic> json) {
+    Booking booking;
+    if (json['booking'] != null) {
+      booking = Booking.fromJson(json['booking']);
+    }
     return Ticket(
       id: json['id'],
       movieScreening: MovieScreening.fromJson(json['movieScreening']),
-      booking: Booking.fromJson(json['booking']),
+      booking: booking,
     );
   }
 }

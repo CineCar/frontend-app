@@ -3,17 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../screens/movie_detail_screen.dart';
 import '../models/movie.dart';
-import '../providers/cart.dart';
+import '../providers/cart_provider.dart';
 
 class MovieItem extends StatelessWidget {
-  // final Movie movie;
-
-  // const MovieItem(this.movie);
-
   @override
   Widget build(BuildContext context) {
     final movie = Provider.of<Movie>(context);
-    final cart = Provider.of<Cart>(context, listen: false);
+    final cart = Provider.of<CartProvider>(context, listen: false);
     return new Column(children: <Widget>[
       new ListTile(
         title: new Text(
@@ -24,27 +20,23 @@ class MovieItem extends StatelessWidget {
           'Running time: ' + movie.duration.toString(),
           textAlign: TextAlign.center,
         ),
-        // leading: new CircleAvatar(
-        //   radius: 30.0,
-        //   backgroundImage: NetworkImage(movie.imageUrl),
-        // ),
-        leading: IconButton(
-            icon: Icon(
-              Icons.shopping_cart,
-            ),
-            onPressed: () {
-              cart.addItem(movie.id.toString(), movie.price, movie.name);
-            }),
+        leading: new CircleAvatar(
+          radius: 30.0,
+          backgroundImage: NetworkImage(movie.imageUrl),
+        ),
         onTap: () {
           Navigator.of(context)
               .pushNamed(MovieDetailScreen.routeName, arguments: movie);
         },
         trailing: IconButton(
-          icon: Icon(movie.isFavorite ? Icons.favorite : Icons.favorite_border),
-          onPressed: () {
-            movie.toggleFavoriteStatus();
-          },
-        ),
+            icon: Icon(
+              Icons.shopping_cart,
+            ),
+            onPressed: () {
+              cart.addTicketToCartx(
+                movie.movieScreenings[0].id,
+              );
+            }),
       ),
       new Divider(
         height: 2.0,
